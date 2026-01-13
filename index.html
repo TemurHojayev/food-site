@@ -3,105 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Food Scanner</title>
+    <title>YouTube Clone</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.0.4/dist/mobilenet.min.js"></script>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #111827; color: white; font-family: sans-serif; }
-        .box { border: 2px solid #374151; background: #1f2937; padding: 20px; border-radius: 20px; }
+        body { background-color: #0f0f0f; color: white; }
+        .sidebar-item:hover { background-color: #272727; }
     </style>
 </head>
-<body class="p-5 flex flex-col items-center justify-center min-h-screen">
+<body>
 
-    <div id="status-box" class="mb-5 p-3 rounded-lg bg-yellow-500/20 text-yellow-500 border border-yellow-500/50">
-        Holat: <span id="status">Kutubxonalar yuklanmoqda...</span>
-    </div>
-
-    <div class="box max-w-md w-full text-center">
-        <h1 class="text-2xl font-bold mb-5 text-orange-500">AI Taom Skaneri</h1>
-        
-        <input type="file" id="imgInput" accept="image/*" class="hidden">
-        <label for="imgInput" id="btnLabel" class="bg-orange-600 hover:bg-orange-700 p-4 rounded-xl cursor-pointer block font-bold transition">
-            TAOMNI RASMGA OLING
-        </label>
-
-        <div id="loading" class="hidden mt-5">
-            <p class="animate-pulse text-orange-400 text-lg">AI tahlil qilmoqda...</p>
-        </div>
-
-        <div id="result" class="hidden mt-5 pt-5 border-t border-gray-600">
-            <img id="preview" class="w-full rounded-lg mb-4 shadow-lg" src="">
-            <div class="bg-black/30 p-4 rounded-lg">
-                <p class="text-gray-400 text-sm">Natija:</p>
-                <p id="food-name" class="text-2xl font-bold text-green-400 capitalize">---</p>
-                <p id="kcal" class="text-orange-400 mt-2 font-semibold"></p>
+    <header class="fixed top-0 left-0 right-0 bg-[#0f0f0f] flex justify-between items-center px-4 h-14 z-50">
+        <div class="flex items-center space-x-4">
+            <i class="fas fa-bars text-xl cursor-pointer p-2 hover:bg-gray-800 rounded-full"></i>
+            <div class="flex items-center cursor-pointer">
+                <i class="fab fa-youtube text-red-600 text-3xl mr-1"></i>
+                <span class="text-xl font-bold tracking-tighter">YouTube</span>
             </div>
         </div>
+
+        <div class="hidden md:flex flex-1 max-w-[720px] ml-10">
+            <div class="flex w-full">
+                <input type="text" placeholder="Search" class="w-full bg-[#121212] border border-[#303030] rounded-l-full px-4 py-2 focus:border-blue-500 outline-none">
+                <button class="bg-[#222222] border border-l-0 border-[#303030] rounded-r-full px-5 py-2 hover:bg-[#303030]">
+                    <i class="fas fa-search text-gray-400"></i>
+                </button>
+            </div>
+            <button class="ml-4 bg-[#181818] p-3 rounded-full hover:bg-gray-800">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <i class="fas fa-video text-xl p-2 hover:bg-gray-800 rounded-full cursor-pointer"></i>
+            <i class="fas fa-bell text-xl p-2 hover:bg-gray-800 rounded-full cursor-pointer"></i>
+            <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center cursor-pointer">G</div>
+        </div>
+    </header>
+
+    <div class="flex pt-14">
+        
+        <aside class="w-60 hidden lg:block fixed left-0 h-screen overflow-y-auto px-2 pb-20">
+            <div class="space-y-1 py-3 border-b border-gray-700">
+                <div class="sidebar-item flex items-center p-2 rounded-lg cursor-pointer bg-[#272727]">
+                    <i class="fas fa-home w-10 text-xl"></i> <span>Home</span>
+                </div>
+                <div class="sidebar-item flex items-center p-2 rounded-lg cursor-pointer">
+                    <i class="fab fa-youtube w-10 text-xl text-red-500"></i> <span>Shorts</span>
+                </div>
+                <div class="sidebar-item flex items-center p-2 rounded-lg cursor-pointer">
+                    <i class="fas fa-layer-group w-10 text-xl"></i> <span>Subscriptions</span>
+                </div>
+            </div>
+            <div class="space-y-1 py-3">
+                <h3 class="px-4 py-1 text-sm font-bold">You ></h3>
+                <div class="sidebar-item flex items-center p-2 rounded-lg cursor-pointer">
+                    <i class="fas fa-history w-10 text-xl"></i> <span>History</span>
+                </div>
+                <div class="sidebar-item flex items-center p-2 rounded-lg cursor-pointer">
+                    <i class="fas fa-play-circle w-10 text-xl"></i> <span>Your videos</span>
+                </div>
+                <div class="sidebar-item flex items-center p-2 rounded-lg cursor-pointer">
+                    <i class="fas fa-clock w-10 text-xl"></i> <span>Watch later</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="lg:ml-60 w-full p-6">
+            <div class="flex space-x-3 overflow-x-auto pb-4 mb-4 scrollbar-hide">
+                <span class="bg-white text-black px-3 py-1 rounded-lg text-sm cursor-pointer whitespace-nowrap">All</span>
+                <span class="bg-[#272727] px-3 py-1 rounded-lg text-sm cursor-pointer hover:bg-gray-600 whitespace-nowrap">Gaming</span>
+                <span class="bg-[#272727] px-3 py-1 rounded-lg text-sm cursor-pointer hover:bg-gray-600 whitespace-nowrap">Music</span>
+                <span class="bg-[#272727] px-3 py-1 rounded-lg text-sm cursor-pointer hover:bg-gray-600 whitespace-nowrap">Live</span>
+                <span class="bg-[#272727] px-3 py-1 rounded-lg text-sm cursor-pointer hover:bg-gray-600 whitespace-nowrap">JavaScript</span>
+                <span class="bg-[#272727] px-3 py-1 rounded-lg text-sm cursor-pointer hover:bg-gray-600 whitespace-nowrap">Computer programming</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                
+                <script>
+                    for(let i=1; i<=12; i++) {
+                        document.write(`
+                        <div class="cursor-pointer group">
+                            <div class="relative">
+                                <img src="https://picsum.photos/seed/${i+20}/400/225" class="rounded-xl w-full group-hover:rounded-none transition-all duration-300">
+                                <span class="absolute bottom-2 right-2 bg-black text-white text-xs px-2 py-1 rounded">12:45</span>
+                            </div>
+                            <div class="flex mt-3 space-x-3">
+                                <img src="https://i.pravatar.cc/150?u=${i}" class="w-9 h-9 rounded-full">
+                                <div>
+                                    <h3 class="font-bold text-sm leading-tight line-clamp-2">JavaScript darslari: 1-qadamdan professional darajagacha #${i}</h3>
+                                    <p class="text-gray-400 text-sm mt-1">Lazzat Tech</p>
+                                    <p class="text-gray-400 text-sm">1.2M views • 2 hours ago</p>
+                                </div>
+                            </div>
+                        </div>
+                        `);
+                    }
+                </script>
+
+            </div>
+        </main>
     </div>
 
-    <script>
-        const status = document.getElementById('status');
-        const imgInput = document.getElementById('imgInput');
-        const preview = document.getElementById('preview');
-        const resultDiv = document.getElementById('result');
-        const foodName = document.getElementById('food-name');
-        const kcal = document.getElementById('kcal');
-        const loading = document.getElementById('loading');
-        
-        let net;
-
-        // 1. AI yuklash funksiyasi
-        async function init() {
-            try {
-                status.innerText = "Sun'iy intellekt yuklanmoqda...";
-                // MobileNet yuklanishi
-                net = await mobilenet.load();
-                status.innerText = "AI TAYYOR!";
-                document.getElementById('status-box').classList.replace('text-yellow-500', 'text-green-500');
-                document.getElementById('status-box').classList.replace('bg-yellow-500/20', 'bg-green-500/20');
-            } catch (err) {
-                status.innerText = "XATO: Internetni tekshiring!";
-                console.error(err);
-            }
-        }
-
-        // 2. Rasm tanlanganda
-        imgInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = async (f) => {
-                preview.src = f.target.result;
-                resultDiv.classList.add('hidden');
-                loading.classList.remove('hidden');
-
-                // AI rasmga qaraydi
-                const img = new Image();
-                img.src = f.target.result;
-                img.onload = async () => {
-                    const predictions = await net.classify(img);
-                    
-                    loading.classList.add('hidden');
-                    resultDiv.classList.remove('hidden');
-
-                    const name = predictions[0].className.split(',')[0];
-                    foodName.innerText = name;
-                    
-                    // Kaloriya hisoblash (sodda)
-                    const calories = { 'pizza': 266, 'burger': 295, 'apple': 52, 'banana': 89, 'rice': 130 };
-                    let c = calories[name.toLowerCase()] || "100-200";
-                    kcal.innerText = "~ " + c + " kkal (100g)";
-                };
-            };
-            reader.readAsDataURL(file);
-        });
-
-        init();
-    </script>
 </body>
 </html>
 
