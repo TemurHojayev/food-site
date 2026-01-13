@@ -3,147 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Food Scanner - Lazzat</title>
+    <title>AI Food Scanner</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.0.4/dist/mobilenet.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap');
-        body { font-family: 'Space Grotesk', sans-serif; background: #0f172a; color: white; }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .ai-glow { box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
+        body { background: #111827; color: white; font-family: sans-serif; }
+        .box { border: 2px solid #374151; background: #1f2937; padding: 20px; border-radius: 20px; }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="p-5 flex flex-col items-center justify-center min-h-screen">
 
-    <nav class="p-6 flex justify-between items-center max-w-6xl mx-auto">
-        <h1 class="text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">
-            Lazzat AI <span class="text-white text-xs font-light">BETA</span>
-        </h1>
-        <div id="status" class="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full border border-red-500/50">
-            AI yuklanmoqda...
+    <div id="status-box" class="mb-5 p-3 rounded-lg bg-yellow-500/20 text-yellow-500 border border-yellow-500/50">
+        Holat: <span id="status">Kutubxonalar yuklanmoqda...</span>
+    </div>
+
+    <div class="box max-w-md w-full text-center">
+        <h1 class="text-2xl font-bold mb-5 text-orange-500">AI Taom Skaneri</h1>
+        
+        <input type="file" id="imgInput" accept="image/*" class="hidden">
+        <label for="imgInput" id="btnLabel" class="bg-orange-600 hover:bg-orange-700 p-4 rounded-xl cursor-pointer block font-bold transition">
+            TAOMNI RASMGA OLING
+        </label>
+
+        <div id="loading" class="hidden mt-5">
+            <p class="animate-pulse text-orange-400 text-lg">AI tahlil qilmoqda...</p>
         </div>
-    </nav>
 
-    <main class="max-w-4xl mx-auto px-4 mt-10">
-        <div class="text-center mb-12">
-            <h2 class="text-4xl md:text-6xl font-bold mb-4 italic">Nima yeyayotganingizni <br> <span class="text-orange-500 italic">AI orqali</span> biling!</h2>
-            <p class="text-gray-400">Taomni rasmga oling va AI uning nomini va taxminiy kaloriyasini aniqlab beradi.</p>
-        </div>
-
-        <div class="glass p-8 rounded-[32px] ai-glow">
-            <div class="flex flex-col items-center">
-                
-                <input type="file" id="imageSelector" accept="image/*" class="hidden">
-                <label for="imageSelector" id="uploadLabel" class="cursor-pointer group flex flex-col items-center">
-                    <div class="w-24 h-24 bg-orange-500 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition duration-300">
-                        <i class="fas fa-camera text-3xl"></i>
-                    </div>
-                    <span class="text-xl font-medium">Rasm yuklash / Rasmga olish</span>
-                </label>
-
-                <div id="loading" class="hidden mt-6 text-center">
-                    <div class="animate-spin w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-                    <p class="text-orange-400">AI tahlil qilmoqda...</p>
-                </div>
-
-                <div id="resultArea" class="hidden w-full mt-8 pt-8 border-t border-white/10">
-                    <img id="previewImage" class="w-full max-h-64 object-cover rounded-2xl mb-6 shadow-2xl" src="">
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-white/5 p-4 rounded-2xl">
-                            <span class="text-xs text-gray-500 block mb-1 uppercase">AI Aniqladi:</span>
-                            <span id="labelName" class="text-2xl font-bold text-orange-400 capitalize">---</span>
-                        </div>
-                        <div class="bg-white/5 p-4 rounded-2xl">
-                            <span class="text-xs text-gray-500 block mb-1 uppercase">Taxminiy Kaloriya:</span>
-                            <span id="calValue" class="text-2xl font-bold text-green-400">---</span>
-                        </div>
-                    </div>
-                </div>
+        <div id="result" class="hidden mt-5 pt-5 border-t border-gray-600">
+            <img id="preview" class="w-full rounded-lg mb-4 shadow-lg" src="">
+            <div class="bg-black/30 p-4 rounded-lg">
+                <p class="text-gray-400 text-sm">Natija:</p>
+                <p id="food-name" class="text-2xl font-bold text-green-400 capitalize">---</p>
+                <p id="kcal" class="text-orange-400 mt-2 font-semibold"></p>
             </div>
         </div>
-    </main>
+    </div>
 
     <script>
-        let model;
         const status = document.getElementById('status');
-        const imageSelector = document.getElementById('imageSelector');
-        const previewImage = document.getElementById('previewImage');
-        const resultArea = document.getElementById('resultArea');
-        const labelName = document.getElementById('labelName');
-        const calValue = document.getElementById('calValue');
+        const imgInput = document.getElementById('imgInput');
+        const preview = document.getElementById('preview');
+        const resultDiv = document.getElementById('result');
+        const foodName = document.getElementById('food-name');
+        const kcal = document.getElementById('kcal');
         const loading = document.getElementById('loading');
-        const uploadLabel = document.getElementById('uploadLabel');
+        
+        let net;
 
-        // Kaloriya bazasi (Sodda variant)
-        const nutrition = {
-            "pizza": "260 kcal", "burger": "290 kcal", "hamburger": "290 kcal",
-            "hotdog": "280 kcal", "sandwich": "250 kcal", "fries": "310 kcal",
-            "salad": "45 kcal", "pasta": "130 kcal", "soup": "50 kcal",
-            "bread": "265 kcal", "apple": "52 kcal", "banana": "89 kcal",
-            "chicken": "240 kcal", "meat": "250 kcal", "cake": "320 kcal"
-        };
-
-        // 1. AI Modelni yuklash
-        async function loadAI() {
+        // 1. AI yuklash funksiyasi
+        async function init() {
             try {
-                model = await mobilenet.load();
-                status.innerText = "AI TAYYOR";
-                status.classList.replace('bg-red-500/20', 'bg-green-500/20');
-                status.classList.replace('text-red-400', 'text-green-400');
-                status.classList.add('border-green-500/50');
-            } catch (e) {
-                status.innerText = "Xatolik!";
-                console.error(e);
+                status.innerText = "Sun'iy intellekt yuklanmoqda...";
+                // MobileNet yuklanishi
+                net = await mobilenet.load();
+                status.innerText = "AI TAYYOR!";
+                document.getElementById('status-box').classList.replace('text-yellow-500', 'text-green-500');
+                document.getElementById('status-box').classList.replace('bg-yellow-500/20', 'bg-green-500/20');
+            } catch (err) {
+                status.innerText = "XATO: Internetni tekshiring!";
+                console.error(err);
             }
         }
 
-        // 2. Rasmni tanlaganda ishlash
-        imageSelector.addEventListener('change', async (event) => {
-            const file = event.target.files[0];
+        // 2. Rasm tanlanganda
+        imgInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = async (e) => {
-                previewImage.src = e.target.result;
-                resultArea.classList.add('hidden');
-                uploadLabel.classList.add('hidden');
+            reader.onload = async (f) => {
+                preview.src = f.target.result;
+                resultDiv.classList.add('hidden');
                 loading.classList.remove('hidden');
 
-                // AI ga rasmni berish
-                setTimeout(async () => {
-                    const predictions = await model.classify(previewImage);
-                    const topResult = predictions[0].className.toLowerCase();
+                // AI rasmga qaraydi
+                const img = new Image();
+                img.src = f.target.result;
+                img.onload = async () => {
+                    const predictions = await net.classify(img);
                     
-                    // Natijani ko'rsatish
                     loading.classList.add('hidden');
-                    uploadLabel.classList.remove('hidden');
-                    resultArea.classList.remove('hidden');
-                    
-                    const firstWord = topResult.split(',')[0];
-                    labelName.innerText = firstWord;
+                    resultDiv.classList.remove('hidden');
 
-                    // Kaloriya hisoblash
-                    let found = false;
-                    for(let key in nutrition) {
-                        if(topResult.includes(key)) {
-                            calValue.innerText = nutrition[key];
-                            found = true;
-                            break;
-                        }
-                    }
-                    if(!found) calValue.innerText = "~150-200 kcal";
-                }, 500);
+                    const name = predictions[0].className.split(',')[0];
+                    foodName.innerText = name;
+                    
+                    // Kaloriya hisoblash (sodda)
+                    const calories = { 'pizza': 266, 'burger': 295, 'apple': 52, 'banana': 89, 'rice': 130 };
+                    let c = calories[name.toLowerCase()] || "100-200";
+                    kcal.innerText = "~ " + c + " kkal (100g)";
+                };
             };
             reader.readAsDataURL(file);
         });
 
-        // Ishga tushirish
-        loadAI();
+        init();
     </script>
 </body>
 </html>
+
