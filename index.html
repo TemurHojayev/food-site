@@ -3,112 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lazzat Food | Mazali Ta'amlar</title>
+    <title>AI Lazzat Food | Smart Oshxona</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-        body { font-family: 'Poppins', sans-serif; }
+        body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
         .hero-bg {
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
                         url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-position: center;
+            background-size: cover; background-position: center;
         }
+        .ai-card { border: 2px dashed #f97316; }
     </style>
 </head>
 <body class="bg-gray-50">
 
-    <nav class="bg-white shadow-lg fixed w-full z-50">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between items-center h-16">
-                <div class="text-2xl font-bold text-orange-500">LAZZAT <span class="text-gray-800">FOOD</span></div>
-                <div class="hidden md:flex space-x-8">
-                    <a href="#" class="text-gray-600 hover:text-orange-500 transition">Asosiy</a>
-                    <a href="#menu" class="text-gray-600 hover:text-orange-500 transition">Menyu</a>
-                    <a href="#about" class="text-gray-600 hover:text-orange-500 transition">Biz haqimizda</a>
-                    <a href="#contact" class="text-gray-600 hover:text-orange-500 transition">Aloqa</a>
-                </div>
-                <button class="bg-orange-500 text-white px-5 py-2 rounded-full hover:bg-orange-600 transition">Buyurtma berish</button>
+    <nav class="bg-white shadow-md fixed w-full z-50">
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center h-16">
+            <div class="text-2xl font-bold text-orange-500 underline">AI LAZZAT</div>
+            <div class="hidden md:flex space-x-8 font-medium">
+                <a href="#" class="hover:text-orange-500">Asosiy</a>
+                <a href="#ai-scanner" class="text-orange-600 font-bold">AI Skaner</a>
+                <a href="#menu" class="hover:text-orange-500">Menyu</a>
             </div>
+            <a href="https://t.me/username" class="bg-orange-500 text-white px-5 py-2 rounded-full text-sm">Bog'lanish</a>
         </div>
     </nav>
 
-    <section class="hero-bg h-screen flex items-center justify-center text-center text-white px-4">
+    <section class="hero-bg h-[80vh] flex items-center justify-center text-center text-white px-4 pt-16">
         <div>
-            <h1 class="text-5xl md:text-7xl font-bold mb-4">Eng mazali ta'amlar</h1>
-            <p class="text-xl mb-8">Siz qidirgan haqiqiy lazzat bizning oshxonada!</p>
-            <a href="#menu" class="bg-orange-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-orange-600 transition">Menyuni ko'rish</a>
+            <span class="bg-orange-500 text-sm px-4 py-1 rounded-full uppercase tracking-widest">Kelajak texnologiyasi</span>
+            <h1 class="text-4xl md:text-6xl font-bold mt-4 mb-6">Taomingizni AI orqali aniqlang</h1>
+            <p class="text-lg mb-8 opacity-90">Rasmga oling, AI taomni va uning kaloriyasini aytib beradi.</p>
+            <a href="#ai-scanner" class="bg-white text-orange-500 px-8 py-4 rounded-full text-lg font-bold hover:bg-orange-100 transition">Skanerni boshlash</a>
         </div>
     </section>
 
-    <section id="menu" class="py-20 max-w-6xl mx-auto px-4">
-        <h2 class="text-4xl font-bold text-center mb-16 text-gray-800">Mashhur Ta'amlarimiz</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-            
-            <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition">
-                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=500&q=80" alt="Pizza" class="w-full h-48 object-cover">
-                <div class="p-6">
-                    <h3 class="text-xl font-bold mb-2">Pepperoni Pizza</h3>
-                    <p class="text-gray-600 mb-4">Maxsus sous va achchiq pepperoni bilan tayyorlangan.</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-orange-500 font-bold text-xl">65,000 so'm</span>
-                        <button class="text-gray-400 hover:text-orange-500"><i class="fas fa-plus-circle text-2xl"></i></button>
+    <section id="ai-scanner" class="py-20 max-w-4xl mx-auto px-4">
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden ai-card">
+            <div class="p-8 text-center">
+                <h2 class="text-3xl font-bold mb-4">AI Kaloriya Skaneri</h2>
+                <p class="text-gray-500 mb-8">Taom rasmini yuklang yoki kamerada rasmga oling</p>
+                
+                <input type="file" id="imageUpload" accept="image/*" class="hidden">
+                <label for="imageUpload" class="bg-orange-500 text-white px-10 py-4 rounded-2xl cursor-pointer hover:bg-orange-600 transition inline-block text-xl shadow-lg shadow-orange-200">
+                    <i class="fas fa-camera mr-2"></i> Rasmga olish
+                </label>
+
+                <div id="loading" class="mt-8 hidden">
+                    <div class="animate-spin inline-block w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full"></div>
+                    <p class="mt-2 text-orange-500 font-medium">Sun'iy intellekt tahlil qilmoqda...</p>
+                </div>
+
+                <div id="imagePreview" class="mt-10 hidden border-t pt-8">
+                    <img id="selectedImage" src="#" alt="Taom" class="mx-auto rounded-2xl max-h-80 shadow-md">
+                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-orange-50 p-4 rounded-xl">
+                            <p class="text-sm text-gray-500 uppercase">Aniqlangan taom:</p>
+                            <p id="foodName" class="text-2xl font-bold text-gray-800 capitalize">...</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-xl">
+                            <p class="text-sm text-gray-500 uppercase">Kaloriya (100g uchun):</p>
+                            <p id="calories" class="text-2xl font-bold text-green-600">...</p>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition">
-                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=500&q=80" alt="Burger" class="w-full h-48 object-cover">
-                <div class="p-6">
-                    <h3 class="text-xl font-bold mb-2">Double Cheese Burger</h3>
-                    <p class="text-gray-600 mb-4">Sershira go'sht va erigan pishloq uyg'unligi.</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-orange-500 font-bold text-xl">45,000 so'm</span>
-                        <button class="text-gray-400 hover:text-orange-500"><i class="fas fa-plus-circle text-2xl"></i></button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition">
-                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=80" alt="Salad" class="w-full h-48 object-cover">
-                <div class="p-6">
-                    <h3 class="text-xl font-bold mb-2">Fresh Grek Salati</h3>
-                    <p class="text-gray-600 mb-4">Sog'lom turmush tarzi uchun eng yangi sabzavotlar.</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-orange-500 font-bold text-xl">30,000 so'm</span>
-                        <button class="text-gray-400 hover:text-orange-500"><i class="fas fa-plus-circle text-2xl"></i></button>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </section>
 
-    <footer id="contact" class="bg-gray-900 text-white py-16 px-4">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
-            <div>
-                <h3 class="text-2xl font-bold mb-4 text-orange-500">LAZZAT FOOD</h3>
-                <p class="text-gray-400">Biz har doim sifatli va yangi mahsulotlardan foydalanamiz.</p>
-            </div>
-            <div>
-                <h4 class="text-xl font-semibold mb-4">Manzilimiz</h4>
-                <p class="text-gray-400 text-sm">Toshkent sh., Navoiy ko'chasi, 12-uy</p>
-                <p class="text-gray-400 text-sm mt-2">Tel: +998 90 123 45 67</p>
-            </div>
-            <div>
-                <h4 class="text-xl font-semibold mb-4">Bizni kuzating</h4>
-                <div class="flex justify-center md:justify-start space-x-6 text-2xl">
-                    <a href="#" class="hover:text-orange-500 transition"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="hover:text-orange-500 transition"><i class="fab fa-telegram"></i></a>
-                    <a href="#" class="hover:text-orange-500 transition"><i class="fab fa-facebook"></i></a>
-                </div>
-            </div>
-        </div>
-        <div class="text-center mt-12 pt-8 border-t border-gray-800 text-gray-500 text-sm">
-            &copy; 2024 Lazzat Food. Barcha huquqlar himoyalangan.
-        </div>
+    <footer class="bg-gray-900 text-white py-10 text-center">
+        <p class="opacity-50 text-sm">© 2026 AI Lazzat Food. Barcha huquqlar himoyalangan.</p>
     </footer>
 
+    <script>
+        const imageUpload = document.getElementById('imageUpload');
+        const selectedImage = document.getElementById('selectedImage');
+        const imagePreview = document.getElementById('imagePreview');
+        const foodName = document.getElementById('foodName');
+        const calories = document.getElementById('calories');
+        const loading = document.getElementById('loading');
+
+        // Kaloriya ma'lumotlar bazasi
+        const calorieDB = {
+            "pizza": "266 kkal",
+            "burger": "295 kkal",
+            "hamburger": "295 kkal",
+            "hotdog": "290 kkal",
+            "sandwich": "250 kkal",
+            "fries": "312 kkal",
+            "salad": "50 kkal",
+            "pasta": "131 kkal",
+            "rice": "130 kkal",
+            "soup": "60 kkal",
+            "cake": "350 kkal",
+            "apple": "52 kkal",
+            "banana": "89 kkal",
+            "chicken": "239 kkal"
+        };
+
+        imageUpload.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                // Tayyorgarlik
+                loading.classList.remove('hidden');
+                imagePreview.classList.add('hidden');
+                
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    selectedImage.src = event.target.result;
+                    
+                    // AI Modelni yuklash (MobileNet)
+                    const model = await mobilenet.load();
+                    
+                    // Rasmni tahlil qilish
+                    const predictions = await model.classify(selectedImage);
+                    
+                    loading.classList.add('hidden');
+                    imagePreview.classList.remove('hidden');
+                    
+                    // Natijani chiqarish
+                    const result = predictions[0].className.split(',')[0].toLowerCase();
+                    foodName.innerText = result;
+
+                    // Kaloriya bazasidan qidirish
+                    let foundCal = "Noma'lum";
+                    for (let key in calorieDB) {
+                        if (result.includes(key)) {
+                            foundCal = calorieDB[key];
+                            break;
+                        }
+                    }
+                    calories.innerText = foundCal;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 </body>
 </html>
